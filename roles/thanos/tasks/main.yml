@@ -1,0 +1,30 @@
+# --- Thanos ---
+- name: Configure Thanos
+  tags:
+    - never
+    - thanos
+  block:
+    - name: Extract Thanos
+      ansible.builtin.unarchive:
+        src: "{{ thanos_url }}"
+        dest: "/opt/"
+        remote_src: true
+
+    - name: Template Thanos bucket config
+      ansible.builtin.template:
+        src: bucket-local.yml.j2
+        dest: "{{ thanos_data_path }}/bucket.yml"
+        mode: '0644'
+      loop:
+        - { src: "bucket-local.yml.j2", dest: "{{ thanos_data_path }}/bucket.yml" }
+        - { src: "thanos-sidecar.service.j2", dest: "/etc/systemd/system/thanos-sidecar.service" }
+        - { src: "thanos-query.service.j2", dest: "/etc/systemd/system/thanos-query.service" }
+
+    - name: Enable and start Thanos
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - thanos-sidecar
+        - thanos-query

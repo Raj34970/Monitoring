@@ -1,0 +1,10 @@
+## code:language=ansible
+---
+- name: Installing Monitoring tools
+  hosts: server
+  gather_facts: true
+  roles:
+    - loki
+    - promtailer
+    - prometheus
+    - thanos

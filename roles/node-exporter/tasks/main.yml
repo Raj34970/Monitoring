@@ -1,0 +1,24 @@
+# --- Node Exporter ---
+- name: Setup monitoring stack on single VM
+  tags:
+    - never
+    - node_exporter
+    - install_all
+  block:
+    - name: Get and extract Node Exporter
+      ansible.builtin.unarchive:
+        src: "{{ node_exporter_url }}"
+        dest: "/opt/"
+        remote_src: true
+
+    - name: Create Node Exporter systemd service
+      ansible.builtin.template:
+        src: node_exporter.service.j2
+        dest: /etc/systemd/system/node_exporter.service
+        mode: '0644'
+
+    - name: Enable and start Node Exporter
+      ansible.builtin.systemd:
+        name: node_exporter
+        enabled: true
+        state: started

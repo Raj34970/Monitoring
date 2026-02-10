@@ -1,0 +1,38 @@
+# --- Prometheus ---
+- name: Configuring Prometheus
+  tags:
+    - never
+    - prometheus
+    - install_all
+  block:
+    - name: Create data directories for Prometheus, Thanos, and Loki
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        mode: '0755'
+      loop:
+        - "{{ prometheus_data_path }}"
+        - "{{ thanos_data_path }}"
+        - "{{ loki_data_path }}"
+
+    - name: Download and extract Prometheus
+      ansible.builtin.unarchive:
+        src: "{{ prometheus_url }}"
+        dest: "/opt/"
+        remote_src: true
+
+    - name: Template Prometheus config
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        mode: '0644'
+      loop:
+        - { src: "prometheus.yml.j2", dest: "/opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml" }
+        - { src: "prometheus.service.j2", dest: "/etc/systemd/system/prometheus.service" }
+    
+    - name: Enable and start Prometheus
+      ansible.builtin.systemd:
+        name: prometheus
+        enabled: true
+        state: started

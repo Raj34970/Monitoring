@@ -1,0 +1,15 @@
+[Unit]
+Description=Thanos Sidecar
+After=network.target prometheus.service
+
+[Service]
+User=root
+ExecStart=/opt/thanos-{{ thanos_version }}.linux-amd64/thanos sidecar \
+--prometheus.url=http://localhost:{{ prometheus_port }} \
+--tsdb.path={{ prometheus_data_path }} \
+--objstore.config-file={{ thanos_data_path }}/bucket.yml \
+--http-address=0.0.0.0:10902 \
+--grpc-address=0.0.0.0:10901
+
+[Install]
+WantedBy=default.target

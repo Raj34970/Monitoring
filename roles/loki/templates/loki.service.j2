@@ -1,0 +1,10 @@
+[Unit]
+Description=Loki
+After=network.target
+
+[Service]
+User=root
+ExecStart=/opt/loki/loki-linux-amd64 -config.file=/opt/loki/loki.yml
+
+[Install]
+WantedBy=default.target

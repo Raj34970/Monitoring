@@ -1,0 +1,5 @@
+---
+loki_version: "2.9.0"
+loki_port: 3100
+promtail_url: "https://github.com/grafana/loki/releases/download/v{{ loki_version }}/loki-linux-amd64.zip"
+loki_data_path: "/opt/loki/data"
