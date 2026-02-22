@@ -6,7 +6,10 @@ After=network.target
 User=root
 ExecStart=/opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus \
     --config.file=/opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml \
-    --storage.tsdb.path={{ prometheus_data_path }}
+    --storage.tsdb.path={{ prometheus_data_path }} \
+    --web.enable-remote-write-receiver
 
 [Install]
 WantedBy=default.target
+
+    

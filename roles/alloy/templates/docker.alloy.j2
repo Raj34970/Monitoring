@@ -1,0 +1,35 @@
+loki.write "default" {
+  endpoint {
+    url = "{{ loki_write_url }}"
+  }
+}
+
+loki.relabel "add_labels" {
+  forward_to = [loki.write.default.receiver]
+
+  rule {
+    target_label = "host"
+    replacement  = "{{ inventory_hostname }}"
+  }
+
+  rule {
+    target_label = "env"
+    replacement  = "{{ env_type }}"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+}
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+loki.source.docker "docker_logs" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.containers.targets
+  forward_to = [loki.relabel.add_labels.receiver]
+}

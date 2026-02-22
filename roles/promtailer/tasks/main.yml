@@ -5,10 +5,16 @@
     - promtail
     - install_all
   block:
+    - name: Download and extract Promtail
+      ansible.builtin.unarchive:
+        src: "{{ promtail_url }}"
+        dest: "/opt/loki/"
+        remote_src: true
+
     - name: Template Promtail config
       ansible.builtin.template:
-        src: promtail.yml.j2
-        dest: "/opt/loki/promtail.yml"
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         mode: '0644'
       loop:
         - { src: "promtail.yml.j2", dest: "/opt/loki/promtail.yml" }

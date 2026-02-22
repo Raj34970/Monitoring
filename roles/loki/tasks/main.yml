@@ -5,6 +5,28 @@
     - loki
     - install_all
   block:
+    - name: Create loki installation directory
+      ansible.builtin.file:
+        path: "/opt/loki"
+        state: directory
+        owner: root
+        mode: '0755'
+
+    - name: Installing required packages
+      ansible.builtin.apt:
+        name: unzip
+        state: present
+
+    - name: Creating required files in /DATA
+      ansible.builtin.file:
+        path: "{{ loki_data_path }}/loki/{{ item }}"
+        state: directory
+        mode: '0644'
+      loop:
+        - compactor
+        - chunks
+        - rules
+
     - name: Unzip Loki
       ansible.builtin.unarchive:
         src: "{{ loki_url }}"
@@ -13,8 +35,8 @@
 
     - name: Template Loki config
       ansible.builtin.template:
-        src: loki.yml.j2
-        dest: "/opt/loki/loki.yml"
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         mode: '0644'
       loop:
         - { src: "loki.yml.j2", dest: "/opt/loki/loki.yml" }

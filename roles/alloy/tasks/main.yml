@@ -1,0 +1,66 @@
+# --- Alloy ---
+- name: Configure Alloy
+  tags:
+    - never
+    - alloy
+    - install_all
+  block:
+    - name: Installing required and basic packages
+      ansible.builtin.apt:
+        name:
+          - unzip
+          - rsyslog
+        state: present
+
+    - name: Create necessory directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "root"
+        group: "root"
+        mode: '0755'
+      loop:
+        - /etc/alloy
+        - /var/lib/alloy
+
+    - name: Downloading and installing Alloy binary
+      ansible.builtin.unarchive:
+        src: "{{ alloy_url }}"
+        dest: "/usr/local/bin/"
+        remote_src: true
+
+    - name: Ensuring binary is executable
+      ansible.builtin.file:
+        path: "{{ alloy_binary_path }}"
+        mode: '0755'
+
+    - name: Creating a symlink for alloy
+      ansible.builtin.file:
+        src: "{{ alloy_binary_path }}"
+        dest: "{{ alloy_binary_symlink_path }}"
+        state: link
+
+    - name: Deploy Alloy config
+      ansible.builtin.template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: "root"
+        group: "root"
+        mode: '0644'
+      loop:
+        - { src: '{{ alloy_service }}.alloy.j2', dest: '/etc/alloy/config.alloy' }
+        - { src: 'alloy.service.j2', dest: '/etc/systemd/system/alloy.service' }
+
+    # - name: Enabling and starting the Alloy service for grafana
+    #   ansible.builtin.service:
+    #     name: alloy
+    #     enabled: true
+    #     state: started
+
+    - name: Enabling and starting the Alloy service for grafana
+      ansible.builtin.command: "{{ item }}"
+      loop:
+        - systemctl daemon-reload
+        - systemctl restart alloy.service
+      register: hard_systemctl_restart_alloy
+      changed_when: hard_systemctl_restart_alloy.rc != 0

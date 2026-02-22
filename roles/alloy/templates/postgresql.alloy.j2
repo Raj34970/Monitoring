@@ -1,0 +1,43 @@
+// =======================
+// LOKI WRITE (The Destination)
+// =======================
+loki.write "default" {
+  endpoint {
+    url = "{{ loki_write_url }}"
+    // If your Loki requires authentication, add basic_auth here
+  }
+}
+
+// =======================
+// LOG PROCESSING (Labels)
+// =======================
+loki.relabel "common_labels" {
+  forward_to = [loki.write.default.receiver]
+
+  // Add the hostname so your Grafana "${hostname}" variable works
+  rule {
+    target_label = "host"
+    replacement  = "{{ inventory_hostname }}"
+  }
+}
+
+// =======================
+// SSH AUTH LOGS
+// =======================
+loki.source.file "ssh_logs" {
+  targets = [
+    { "__path__" = "/var/log/auth.log", "job" = "ssh" },
+    { "__path__" = "/var/log/secure", "job" = "ssh" },
+  ]
+  forward_to = [loki.relabel.common_labels.receiver]
+}
+
+// =======================
+// POSTGRES LOGS
+// =======================
+loki.source.file "postgres_logs" {
+  targets = [
+    { "__path__" = "/var/log/postgresql/postgresql-15-main.log", "job" = "postgresql", "filename" = "/var/log/postgresql/postgresql-15-main.log" },
+  ]
+  forward_to = [loki.relabel.common_labels.receiver]
+}

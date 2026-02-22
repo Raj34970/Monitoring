@@ -1,0 +1,36 @@
+loki.write "default" {
+  endpoint {
+    url = "http://172.16.0.30:3100/loki/api/v1/push"
+  }
+}
+
+loki.relabel "add_labels" {
+  forward_to = [loki.write.default.receiver]
+
+  rule {
+    target_label = "host"
+    replacement  =  "{{ inventory_hostname }}"
+  }
+
+  rule {
+    target_label = "env"
+    replacement  = "{{ env_type }}"
+  }
+}
+
+loki.source.file "ssh_auth_logs" {
+  targets = [
+    { "__path__" = "/var/log/auth.log", "job" = "{{ inventory_hostname }}"+"_ssh_auth" },
+  ]
+  forward_to = [loki.relabel.format_auth_job.receiver]
+}
+
+loki.relabel "format_auth_job" {
+  forward_to = [loki.relabel.add_labels.receiver]
+
+  rule {
+    source_labels = ["job"]
+    replacement   = "{{ inventory_hostname }}" + "_ssh_auth"
+    target_label  = "job"
+  }
+}

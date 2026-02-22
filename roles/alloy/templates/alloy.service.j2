@@ -1,0 +1,22 @@
+[Unit]
+Description=Grafana Alloy
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+User=root
+ExecStart=/usr/local/bin/alloy run /etc/alloy/config.alloy --server.http.listen-addr=0.0.0.0:12345
+Restart=on-failure
+RestartSec=5s
+StartLimitIntervalSec=60
+StartLimitBurst=5
+
+MemoryMax=500M
+MemoryHigh=400M
+
+KillMode=process
+Nice=-10
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

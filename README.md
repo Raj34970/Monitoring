@@ -5,6 +5,7 @@ This playbook installs the following monitoring agents
     - Prometheus
     - Thanos
     - node-exporter
+    - alloy
 
 ## Usage
 ```bash

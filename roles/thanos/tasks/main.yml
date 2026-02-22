@@ -3,17 +3,18 @@
   tags:
     - never
     - thanos
+    - install_all
   block:
     - name: Extract Thanos
       ansible.builtin.unarchive:
         src: "{{ thanos_url }}"
-        dest: "/opt/"
+        dest: "/opt/"w
         remote_src: true
 
     - name: Template Thanos bucket config
       ansible.builtin.template:
-        src: bucket-local.yml.j2
-        dest: "{{ thanos_data_path }}/bucket.yml"
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         mode: '0644'
       loop:
         - { src: "bucket-local.yml.j2", dest: "{{ thanos_data_path }}/bucket.yml" }

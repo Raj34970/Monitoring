@@ -5,7 +5,7 @@ After=network.target thanos-sidecar.service
 [Service]
 User=root
 ExecStart=/opt/thanos-{{ thanos_version }}.linux-amd64/thanos query \
-    --store=localhost:10901 \
+    --endpoint=localhost:10901 \
     --http-address=0.0.0.0:{{ thanos_query_port }}
 
 [Install]

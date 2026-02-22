@@ -1,5 +1,1 @@
----
-thanos_version: "v1.19.0"
-thanos_query_port: 9091
-thanos_url: "https://github.com/thanos-io/thanos/releases/download/{{ thanos_version }}/thanos-{{ thanos_version }}.linux-amd64.tar.gz"
-thanos_data_path: "/opt/thanos/data"
+thanos_url: "https://github.com/thanos-io/thanos/releases/download/v{{ thanos_version }}/thanos-{{ thanos_version }}.linux-amd64.tar.gz"

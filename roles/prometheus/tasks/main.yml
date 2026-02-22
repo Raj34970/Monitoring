@@ -9,7 +9,7 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        owner: "{{ ansible_user }}"
+        owner: root
         mode: '0755'
       loop:
         - "{{ prometheus_data_path }}"
@@ -30,7 +30,7 @@
       loop:
         - { src: "prometheus.yml.j2", dest: "/opt/prometheus-{{ prometheus_version }}.linux-amd64/prometheus.yml" }
         - { src: "prometheus.service.j2", dest: "/etc/systemd/system/prometheus.service" }
-    
+
     - name: Enable and start Prometheus
       ansible.builtin.systemd:
         name: prometheus

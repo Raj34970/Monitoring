@@ -6,6 +6,3 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:{{ node_exporter_port }}"]
 
-  - job_name: "nodejs_app"
-    static_configs:
-      - targets: ["localhost:{{ nodejs_app_port }}"]

@@ -1,10 +1,18 @@
 ## code:language=ansible
 ---
-- name: Installing Monitoring tools
+- name: Installing alloy agent for Grafana
   hosts: server
   gather_facts: true
   roles:
+    - alloy
+
+- name: Installing monitoring agent services like Prometheus, Loki, Thanos, and Promtailer
+  hosts: monitoring_storage_server
+  gather_facts: true
+  roles:
+    # - prometheus
     - loki
-    - promtailer
-    - prometheus
-    - thanos
+    # - promtailer
+    # - thanos
+
+# ansible-playbook -i inventory.ini main.yml -t install_all
