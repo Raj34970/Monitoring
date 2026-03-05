@@ -1,0 +1,32 @@
+loki.write "default" {
+  endpoint {
+    url = "{{ loki_write_url }}"
+  }
+}
+
+loki.relabel "add_labels" {
+  forward_to = [loki.write.default.receiver]
+  rule {
+    target_label = "host"
+    replacement  = "glpi-pandora"
+  }
+
+  rule {
+    target_label = "env"
+    replacement  = "{{ env_type }}"
+  }
+
+}
+
+loki.source.file "glpi_pandora_logs" {
+  targets = [
+    { "__path__" = "/var/www/html/glpi_prod/files/_log/mail.log", "job" = "mail_log" },
+    { "__path__" = "/var/www/html/glpi_prod/files/_log/mailgate.log", "job" = "mailgate_log" },
+    { "__path__" = "/var/www/html/glpi_prod/files/_log/event.log", "job" = "event_log" },
+    { "__path__" = "/var/www/html/glpi_prod/files/_log/sql-errors.log", "job" = "sql_error_log" },
+    { "__path__" = "/var/www/html/glpi_prod/files/_log/mail-error.log", "job" = "mail_error_log" },
+    { "__path__" = "/var/www/html/glpi_prod/files/_log/access-errors.log", "job" = "access_error_log" },
+    { "__path__" = "/var/www/html/glpi_prod/files/_log/mail-debug.log", "job" = "mail_debug_log" },
+  ]
+  forward_to = [loki.relabel.add_labels.receiver]
+}
