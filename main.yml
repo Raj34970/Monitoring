@@ -11,7 +11,7 @@
   gather_facts: true
   roles:
     # - prometheus
-    - loki
+    # - loki
     # - promtailer
     # - thanos
 
